@@ -1,14 +1,14 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Blueprint
+from flaskapp.userroutes import userManagementBlueprint
+from flaskapp.lectureroutes import lecturerManagementBlueprint
+from firebase_admin import credentials, firestore, initialize_app
+
+
 app = Flask(__name__)
 
-# A welcome message to test our server
 
-
-@app.route('/')
-def index():
-    return "<h1>Welcome to our server !!</h1>"
-
+app.register_blueprint(userManagementBlueprint)
+app.register_blueprint(lecturerManagementBlueprint)
 
 if __name__ == '__main__':
-    # Threaded option to enable multiple instances for multiple user access support
-    app.run(threaded=True, port=5000)
+    app.run(threaded=True, port=5000, debug=True)
