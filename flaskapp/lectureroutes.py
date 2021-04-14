@@ -8,7 +8,8 @@ from flaskapp.response import (
     DataAlreadyExsist,
     OperationCorrect,
     MethodNotAvailable,
-    AuthenticationFailed
+    AuthenticationFailed,
+    DeleteSucessful
 )
 db = firestore.client()
 lecturerManagementBlueprint = Blueprint(
@@ -37,7 +38,7 @@ def subject_management():
             return OperationFailed(str(e))
 
 
-@lecturerManagementBlueprint.route('/lecture', methods=['GET', 'POST'])
+@lecturerManagementBlueprint.route('/lecture', methods=['GET', 'POST', 'DELETE'])
 def lecture_management():
     body = request.get_json(silent=True)
     if request.method == "POST":
@@ -54,7 +55,6 @@ def lecture_management():
             return OperationFailed(str(e))
     if request.method == "GET":
         try:
-            print(body)
             if body:
                 if "subject_id" in body:
                     lecture_ref = db.collection('lecture').where(
@@ -64,10 +64,25 @@ def lecture_management():
                         u'lecture_id', u'==', body["lecture_id"]).stream()
             else:
                 lecture_ref = db.collection('lecture').stream()
-            print(lecture_ref)
             lecture_arr = list()
             for lecture in lecture_ref:
                 lecture_arr.append(lecture.to_dict())
             return OperationCorrect(data=lecture_arr)
+        except Exception as e:
+            return OperationFailed(str(e))
+
+    if request.method == "DELETE":
+        try:
+            if body:
+                lecture = Lecture(**body)
+                lecture_ref = db.collection('lecture').document(
+                    str(lecture.lecture_day+lecture.lecture_time))
+                if lecture_ref.get().exists:
+                    lecture_ref.delete()
+                    return DeleteSucessful()
+                else:
+                    return NotFound()
+            else:
+                return NotFound()
         except Exception as e:
             return OperationFailed(str(e))
