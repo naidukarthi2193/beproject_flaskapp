@@ -32,8 +32,7 @@ def login_user():
             if body["role"] == "student":
                 user_obj = StudentProfile(**body)
             if body["role"] == "teacher":
-                user_obj = Teacher
-                Profile(**body)
+                user_obj = TeacherProfile(**body)
             profile_ref = db.collection('profile').document(body["email"])
             profile_ref.set(user_obj.__dict__)
             response = OperationCorrect(data=body)
