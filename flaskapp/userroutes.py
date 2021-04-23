@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, Blueprint, make_response
 from firebase_admin import credentials, firestore, initialize_app
 from flaskapp.models import StudentProfile, TeacherProfile
+from google.cloud.firestore import ArrayUnion
 from flaskapp.response import (
     OperationFailed,
     InternalServerError,
@@ -29,9 +30,17 @@ def login_user():
     if request.method == "POST":
         try:
             user_ref = db.collection('signupusers').document(body["email"])
+            user = user_ref.get()
+            if user.exists:
+                return DataAlreadyExsist()
             user_ref.set(body)
+            if body["role"] == "student":
+                user_obj = StudentProfile(**body)
+            if body["role"] == "teacher":
+                user_obj = Teacher
+                Profile(**body)
             profile_ref = db.collection('profile').document(body["email"])
-            profile_ref.set(body)
+            profile_ref.set(user_obj.__dict__)
             response = OperationCorrect(data=body)
         except Exception as e:
             response = OperationFailed(str(e))
@@ -68,9 +77,11 @@ def profile_user():
                 user_obj = TeacherProfile(**user)
             if request.method == "POST":
                 try:
-                    user_ref = db.collection('profile').document(body["email"])
+                    profile_ref = db.collection(
+                        'profile').document(body["email"])
                     modified_data = dict(user_obj.__dict__, **body)
-                    user_ref.update(modified_data)
+                    print(modified_data)
+                    profile_ref.update(modified_data)
                     return OperationCorrect(data=modified_data)
                 except Exception as e:
                     return OperationFailed(str(e))
@@ -80,3 +91,21 @@ def profile_user():
     except Exception as e:
         response = OperationFailed(str(e))
     return response
+
+
+@userManagementBlueprint.route('/addSubject', methods=['POST', 'GET'])
+def addLecture():
+    body = request.get_json(silent=True)
+    if request.method == "POST":
+        user_ref = db.collection('profile').document(body["email"])
+        user = user_ref.get()
+        if user.exists:
+            user = user.to_dict()
+            if user["role"] == "student":
+                user_obj = StudentProfile(**user)
+                user_ref.update(
+                    {u'enrolledSubjects': ArrayUnion([body["subject_id"]])})
+                user = user_ref.get()
+                return OperationCorrect(data=user.to_dict())
+            else:
+                return AuthenticationFailed()

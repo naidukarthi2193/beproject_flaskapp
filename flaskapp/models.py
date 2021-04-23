@@ -17,6 +17,7 @@ class StudentProfile:
         self.batch = kwargs.get('batch', "")
         self.enrolledSubjects = kwargs.get('enrolledSubjects', [])
         self.prn = kwargs.get('prn', "")
+        self.role = kwargs.get('role', "")
 
 
 class TeacherProfile:
@@ -36,6 +37,7 @@ class TeacherProfile:
         self.name = kwargs.get('name', "")
         self.department = kwargs.get('department', "")
         self.prn = kwargs.get('prn', "")
+        self.role = kwargs.get('role', "")
 
 
 class Lecture:
@@ -73,7 +75,7 @@ class Subject:
         """
 
         self.subject_id = kwargs.get('subject_id', "")
-        self.teacher_email = kwargs.get('teacher_email', "")
+        self.email = kwargs.get('email', "")
         self.total_lectures = kwargs.get('total_lectures', "")
 
 

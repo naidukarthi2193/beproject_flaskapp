@@ -29,11 +29,22 @@ def subject_management():
             return OperationFailed(str(e))
     else:
         try:
-            subject_ref = db.collection('subject').stream()
+            if body:
+                if "subject_id" in body:
+                    subject_ref = db.collection('subject').where(
+                        u'subject_id', u'==', body["subject_id"]).stream()
+                if "email" in body:
+                    subject_ref = db.collection('subject').where(
+                        u'email', u'==', body["email"]).stream()
+            else:
+                subject_ref = db.collection('subject').stream()
             subject_arr = list()
             for subject in subject_ref:
                 subject_arr.append(subject.to_dict())
-            return OperationCorrect(data=subject_arr)
+            if subject_arr:
+                return OperationCorrect(data=subject_arr)
+            else:
+                return NotFound()
         except Exception as e:
             return OperationFailed(str(e))
 
@@ -67,7 +78,10 @@ def lecture_management():
             lecture_arr = list()
             for lecture in lecture_ref:
                 lecture_arr.append(lecture.to_dict())
-            return OperationCorrect(data=lecture_arr)
+            if lecture_arr:
+                return OperationCorrect(data=lecture_arr)
+            else:
+                return NotFound()
         except Exception as e:
             return OperationFailed(str(e))
 
