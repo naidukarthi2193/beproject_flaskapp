@@ -19,11 +19,6 @@ db = firestore.client()
 userManagementBlueprint = Blueprint("userManagementBlueprint", __name__)
 
 
-@userManagementBlueprint.route('/', methods=["GET"])
-def index():
-    return "<h1>Welcome to our server !!</h1>"
-
-
 @userManagementBlueprint.route('/login', methods=['GET', 'POST'])
 def login_user():
     body = request.get_json(silent=True)
