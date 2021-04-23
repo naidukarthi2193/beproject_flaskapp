@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, Blueprint, url_for
+from flask import Flask, request, jsonify, Blueprint, url_for, send_from_directory
 from flaskapp.userroutes import userManagementBlueprint
 from flaskapp.lectureroutes import lecturerManagementBlueprint
 from flaskapp.quizroutes import quizManagementBlueprint
@@ -6,11 +6,19 @@ from flaskapp.attendanceroutes import attendanceManagementBlueprint
 from flaskapp.reportroutes import reportManagementBlueprint
 from firebase_admin import credentials, firestore, initialize_app
 import urllib
+import os
 from flaskapp.response import (
     OperationCorrect
 )
 
 app = Flask(__name__)
+
+
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static'),
+                               'favicon.ico', mimetype='image/vnd.microsoft.icon')
+
 
 app.register_blueprint(userManagementBlueprint)
 app.register_blueprint(lecturerManagementBlueprint)
