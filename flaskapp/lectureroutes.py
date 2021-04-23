@@ -61,6 +61,14 @@ def lecture_management():
                 return DataAlreadyExsist()
             else:
                 lecture_ref.set(lecture.__dict__)
+                attendance_ref = db.collection(
+                    "attendance").document(lecture.lecture_id)
+                empty_attendance = dict()
+                empty_attendance["students"] = []
+                empty_attendance["total"] = 0
+                empty_attendance["subject_id"] = lecture.subject_id
+                empty_attendance["max_students"] = 10
+                attendance_ref.set(empty_attendance)
                 return OperationCorrect(data=body)
         except Exception as e:
             return OperationFailed(str(e))

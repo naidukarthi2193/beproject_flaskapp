@@ -87,19 +87,19 @@ def profile_user():
     return response
 
 
-@userManagementBlueprint.route('/addSubject', methods=['POST', 'GET'])
-def addLecture():
-    body = request.get_json(silent=True)
-    if request.method == "POST":
-        user_ref = db.collection('profile').document(body["email"])
-        user = user_ref.get()
-        if user.exists:
-            user = user.to_dict()
-            if user["role"] == "student":
-                user_obj = StudentProfile(**user)
-                user_ref.update(
-                    {u'enrolledSubjects': ArrayUnion([body["subject_id"]])})
-                user = user_ref.get()
-                return OperationCorrect(data=user.to_dict())
-            else:
-                return AuthenticationFailed()
+# @userManagementBlueprint.route('/addSubject', methods=['POST'])
+# def addLecture():
+#     body = request.get_json(silent=True)
+#     if request.method == "POST":
+#         user_ref = db.collection('profile').document(body["email"])
+#         user = user_ref.get()
+#         if user.exists:
+#             user = user.to_dict()
+#             if user["role"] == "student":
+#                 user_obj = StudentProfile(**user)
+#                 user_ref.update(
+#                     {u'enrolledSubjects': ArrayUnion([body["subject_id"]])})
+#                 user = user_ref.get()
+#                 return OperationCorrect(data=user.to_dict())
+#             else:
+#                 return AuthenticationFailed()

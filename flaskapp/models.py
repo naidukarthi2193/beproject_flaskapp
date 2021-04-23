@@ -15,7 +15,6 @@ class StudentProfile:
         self.name = kwargs.get('name', "")
         self.year = kwargs.get('year', "")
         self.batch = kwargs.get('batch', "")
-        self.enrolledSubjects = kwargs.get('enrolledSubjects', [])
         self.prn = kwargs.get('prn', "")
         self.role = kwargs.get('role', "")
 
@@ -57,7 +56,7 @@ class Lecture:
         self.subject_id = kwargs.get('subject_id', "")
         self.lecture_day = kwargs.get('lecture_day', "0")
         self.lecture_time = kwargs.get('lecture_time', "0")
-        self.attention_data = kwargs.get('attention_data', [])
+        # self.attention_data = kwargs.get('attention_data', [])
 
 
 class Subject:
@@ -101,4 +100,5 @@ class QuizData:
         self.correct_option = kwargs.get('correct_option', "")
         self.solution = kwargs.get('solution', "")
         self.lecture_id = kwargs.get('lecture_id', "")
+        self.subject_id = kwargs.get('subject_id', "")
         self.quiz_data = kwargs.get('quiz_data', [])

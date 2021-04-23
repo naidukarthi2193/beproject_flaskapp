@@ -2,6 +2,8 @@ from flask import Flask, request, jsonify, Blueprint, url_for
 from flaskapp.userroutes import userManagementBlueprint
 from flaskapp.lectureroutes import lecturerManagementBlueprint
 from flaskapp.quizroutes import quizManagementBlueprint
+from flaskapp.attendanceroutes import attendanceManagementBlueprint
+from flaskapp.reportroutes import reportManagementBlueprint
 from firebase_admin import credentials, firestore, initialize_app
 import urllib
 from flaskapp.response import (
@@ -13,12 +15,8 @@ app = Flask(__name__)
 app.register_blueprint(userManagementBlueprint)
 app.register_blueprint(lecturerManagementBlueprint)
 app.register_blueprint(quizManagementBlueprint)
-
-
-def has_no_empty_params(rule):
-    defaults = rule.defaults if rule.defaults is not None else ()
-    arguments = rule.arguments if rule.arguments is not None else ()
-    return len(defaults) >= len(arguments)
+app.register_blueprint(attendanceManagementBlueprint)
+app.register_blueprint(reportManagementBlueprint)
 
 
 @app.route("/")
@@ -28,7 +26,10 @@ def site_map():
         options = {}
         for arg in rule.arguments:
             options[arg] = "[{0}]".format(arg)
-        methods = ','.join(rule.methods)
+        methods = rule.methods
+        methods.discard("OPTIONS")
+        methods.discard("HEAD")
+        methods = ','.join(methods)
         url = url_for(rule.endpoint, **options)
         url_data = dict()
         url_data["functions"] = rule.endpoint
