@@ -40,11 +40,12 @@ def login_user():
             response = OperationFailed(str(e))
     elif request.method == "GET":
         try:
-            user_ref = db.collection('signupusers').document(body["email"])
+            user_ref = db.collection('signupusers').document(
+                request.args.get('email'))
             user = user_ref.get()
             if user.exists:
                 user = user.to_dict()
-                if body["email"] == user["email"] and body["password"] == user["password"]:
+                if request.args.get('email') == user["email"] and request.args.get('password') == user["password"]:
                     response = OperationCorrect(data=user)
                 else:
                     response = AuthenticationFailed()
@@ -61,7 +62,11 @@ def login_user():
 def profile_user():
     body = request.get_json(silent=True)
     try:
-        user_ref = db.collection('profile').document(body["email"])
+        if request.method == "POST":
+            user_ref = db.collection('profile').document(body["email"])
+        else:
+            user_ref = db.collection('profile').document(
+                request.args.get('email'))
         user = user_ref.get()
         if user.exists:
             user = user.to_dict()

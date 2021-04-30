@@ -17,7 +17,31 @@ quizManagementBlueprint = Blueprint(
     "quizManagementBlueprint", __name__)
 
 
-@quizManagementBlueprint.route('/quizData', methods=['GET', 'POST', 'DELETE'])
+@quizManagementBlueprint.route('/getQuizData', methods=['POST'])
+def get_quiz_data():
+    body = request.get_json(silent=True)
+    try:
+        if body:
+            if "lecture_id" in body:
+                quiz_ref = db.collection('quiz').where(
+                    u'lecture_id', u'==', body["lecture_id"]).stream()
+            if "quiz_id" in body:
+                quiz_ref = db.collection('quiz').where(
+                    u'quiz_id', u'==', body["quiz_id"]).stream()
+        else:
+            quiz_ref = db.collection('quiz').stream()
+        quiz_arr = list()
+        for quiz in quiz_ref:
+            quiz_arr.append(quiz.to_dict())
+        if quiz_arr:
+            return OperationCorrect(data=quiz_arr)
+        else:
+            return NotFound()
+    except Exception as e:
+        return OperationFailed(str(e))
+
+
+@quizManagementBlueprint.route('/quizData', methods=['POST', 'DELETE'])
 def quiz_data_management():
     body = request.get_json(silent=True)
     if request.method == "POST":
@@ -28,26 +52,6 @@ def quiz_data_management():
                 return DataAlreadyExsist()
             quiz_ref.set(QuizData(**body).__dict__)
             return OperationCorrect(data=body)
-        except Exception as e:
-            return OperationFailed(str(e))
-    if request.method == "GET":
-        try:
-            if body:
-                if "lecture_id" in body:
-                    quiz_ref = db.collection('quiz').where(
-                        u'lecture_id', u'==', body["lecture_id"]).stream()
-                if "quiz_id" in body:
-                    quiz_ref = db.collection('quiz').where(
-                        u'quiz_id', u'==', body["quiz_id"]).stream()
-            else:
-                quiz_ref = db.collection('quiz').stream()
-            quiz_arr = list()
-            for quiz in quiz_ref:
-                quiz_arr.append(quiz.to_dict())
-            if quiz_arr:
-                return OperationCorrect(data=quiz_arr)
-            else:
-                return NotFound()
         except Exception as e:
             return OperationFailed(str(e))
 
