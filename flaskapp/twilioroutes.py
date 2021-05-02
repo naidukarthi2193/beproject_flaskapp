@@ -20,9 +20,12 @@ from twilio.jwt.access_token.grants import VideoGrant
 db = firestore.client()
 twilioBlueprint = Blueprint(
     "twilioBlueprint", __name__)
-twilio_account_sid = os.environ.get('TWILIO_ACCOUNT_SID')
-twilio_api_key_sid = os.environ.get('TWILIO_API_KEY_SID')
-twilio_api_key_secret = os.environ.get('TWILIO_API_KEY_SECRET')
+twilio_account_sid = os.environ.get(
+    'TWILIO_ACCOUNT_SID', "AC26d2cdf7ef7a49dee692b7c5d8cc52f4")
+twilio_api_key_sid = os.environ.get(
+    'TWILIO_API_KEY_SID', "SK67e22e0438e9998a0ee91f18ed0d3c1e")
+twilio_api_key_secret = os.environ.get(
+    'TWILIO_API_KEY_SECRET', "xdIX2ajCaPDSlVzK9HHE2Dv76djHnmIh")
 
 
 @twilioBlueprint.route('/twiliologin', methods=['POST'])
