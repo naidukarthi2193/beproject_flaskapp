@@ -1,17 +1,52 @@
 from flask import Flask, request, jsonify, Blueprint, url_for, send_from_directory
+from firebase_admin import credentials, firestore, initialize_app
+import urllib
+import pika
+import os
+from flaskapp.response import OperationCorrect
+from dotenv import load_dotenv
+import atexit
+from apscheduler.scheduler import Scheduler
+
 from flaskapp.userroutes import userManagementBlueprint
 from flaskapp.lectureroutes import lecturerManagementBlueprint
 from flaskapp.quizroutes import quizManagementBlueprint
 from flaskapp.attendanceroutes import attendanceManagementBlueprint
 from flaskapp.reportroutes import reportManagementBlueprint
-from firebase_admin import credentials, firestore, initialize_app
-import urllib
-import os
-from flaskapp.response import (
-    OperationCorrect
-)
+from flaskapp.twilioroutes import twilioBlueprint
+from flaskapp.consumer import consumer
+
+
+load_dotenv()
 
 app = Flask(__name__)
+
+# cron = Scheduler(daemon=True)
+# url = os.environ.get(
+#     'CLOUDAMQP_URL', 'amqp://guest:guest@localhost:5672/')
+# params = pika.URLParameters(url)
+# try:
+#     connection = pika.BlockingConnection(params)
+# except Exception as e:
+#     connection = None
+#     print(e)
+# TIME_INTERVAL = os.environ.get(
+#     'TIME_INTERVAL', 3)
+
+
+# @cron.interval_schedule(seconds=3)
+# def rabbitmq():
+#     try:
+#         consumer(connection)
+#     except Exception as e:
+#         print(e)
+
+
+# cron.start()
+
+
+# atexit.register(lambda: cron.shutdown(wait=False))
+# atexit.register(lambda: connection.close())
 
 
 @app.route('/favicon.ico')
@@ -25,6 +60,7 @@ app.register_blueprint(lecturerManagementBlueprint)
 app.register_blueprint(quizManagementBlueprint)
 app.register_blueprint(attendanceManagementBlueprint)
 app.register_blueprint(reportManagementBlueprint)
+app.register_blueprint(twilioBlueprint)
 
 
 @app.route("/")
