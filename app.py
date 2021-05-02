@@ -4,6 +4,7 @@ import urllib
 import pika
 import os
 from flaskapp.response import OperationCorrect
+from flask_cors import CORS
 from dotenv import load_dotenv
 import atexit
 from apscheduler.scheduler import Scheduler
@@ -20,7 +21,7 @@ from flaskapp.consumer import consumer
 load_dotenv()
 
 app = Flask(__name__)
-
+CORS(app)
 # cron = Scheduler(daemon=True)
 # url = os.environ.get(
 #     'CLOUDAMQP_URL', 'amqp://guest:guest@localhost:5672/')
