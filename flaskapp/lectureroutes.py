@@ -96,6 +96,9 @@ def lecture_management():
                 empty_attendance["subject_id"] = lecture.subject_id
                 empty_attendance["max_students"] = 10
                 attendance_ref.set(empty_attendance)
+                attention_ref = db.collection(
+                    'attention').document(lecture.lecture_id)
+                attention_ref.set(dict())
                 return OperationCorrect(data=body)
         except Exception as e:
             return OperationFailed(str(e))

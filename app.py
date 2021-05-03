@@ -17,44 +17,37 @@ from flaskapp.reportroutes import reportManagementBlueprint
 from flaskapp.twilioroutes import twilioBlueprint
 from flaskapp.consumer import consumer
 
-
 load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
-# cron = Scheduler(daemon=True)
-# url = os.environ.get(
-#     'CLOUDAMQP_URL', 'amqp://guest:guest@localhost:5672/')
-# params = pika.URLParameters(url)
-# try:
-#     connection = pika.BlockingConnection(params)
-# except Exception as e:
-#     connection = None
-#     print(e)
-# TIME_INTERVAL = os.environ.get(
-#     'TIME_INTERVAL', 3)
 
 
-# @cron.interval_schedule(seconds=3)
-# def rabbitmq():
-#     try:
-#         consumer(connection)
-#     except Exception as e:
-#         print(e)
+try:
+    url = os.environ.get('CLOUDAMQP_URL', 'amqp://guest:guest@localhost:5672/')
+    params = pika.URLParameters(url)
+    connection = pika.BlockingConnection(params)
+except Exception as e:
+    connection = None
+    print(e)
 
 
-# cron.start()
+cron = Scheduler()
+cron.start()
 
 
-# atexit.register(lambda: cron.shutdown(wait=False))
-# atexit.register(lambda: connection.close())
+@cron.interval_schedule(seconds=10)
+def rabbitmq():
+    try:
+        print("START CONSUMER")
+        consumer(connection)
+    except Exception as e:
+        print(e)
+        cron.shutdown(wait=False)
 
 
-@app.route('/favicon.ico')
-def favicon():
-    return send_from_directory(os.path.join(app.root_path, 'static'),
-                               'favicon.ico', mimetype='image/vnd.microsoft.icon')
-
+atexit.register(lambda: cron.shutdown(wait=False))
+atexit.register(lambda: connection.close())
 
 app.register_blueprint(userManagementBlueprint)
 app.register_blueprint(lecturerManagementBlueprint)
@@ -82,6 +75,12 @@ def site_map():
         url_data["url"] = url
         output.append(url_data)
     return OperationCorrect(data=output)
+
+
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static'),
+                               'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 
 if __name__ == '__main__':

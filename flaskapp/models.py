@@ -56,6 +56,7 @@ class Lecture:
         self.subject_id = kwargs.get('subject_id', "")
         self.lecture_day = kwargs.get('lecture_day', "0")
         self.lecture_time = kwargs.get('lecture_time', "0")
+        self.teacher_id = kwargs.get('teacher_id', "")
         # self.attention_data = kwargs.get('attention_data', [])
 
 
