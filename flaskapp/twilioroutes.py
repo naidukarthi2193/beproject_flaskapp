@@ -14,6 +14,7 @@ from flaskapp.response import (
     AuthenticationFailed,
     DeleteSucessful
 )
+import numpy as np
 from twilio.jwt.access_token import AccessToken
 from twilio.jwt.access_token.grants import VideoGrant
 
@@ -28,6 +29,18 @@ twilio_api_key_secret = os.environ.get(
     'TWILIO_API_KEY_SECRET', "xdIX2ajCaPDSlVzK9HHE2Dv76djHnmIh")
 
 
+db = firestore.client()
+
+
+def tolerant_mean(arrs):
+    lens = [len(i) for i in arrs]
+    arr = np.ma.empty((np.max(lens), len(arrs)))
+    arr.mask = True
+    for idx, l in enumerate(arrs):
+        arr[:len(l), idx] = l
+    return arr.mean(axis=-1), arr.std(axis=-1)
+
+
 @twilioBlueprint.route('/twiliologin', methods=['POST'])
 def teacherLecture():
     body = request.get_json(force=True)
@@ -39,3 +52,22 @@ def teacherLecture():
                         twilio_api_key_secret, identity=email)
     token.add_grant(VideoGrant(room=lecture_id))
     return {'token': token.to_jwt().decode()}
+
+
+@twilioBlueprint.route('/classAttention', methods=['POST'])
+def classAttention():
+    body = request.get_json(force=True)
+    try:
+        attention_ref = db.collection(
+            'attention').document(body["lecture_id"]).get()
+        attentiondata = attention_ref.to_dict()
+        grapharr = []
+        for key in attentiondata.keys():
+            grapharr.append([data["attention"] for data in attentiondata[key]])
+        # print(grapharr)
+        grapharr = np.array(grapharr, dtype=object)
+        classAvg, error = tolerant_mean(grapharr)
+    except Exception as e:
+        print(e)
+        return OperationFailed()
+    return OperationCorrect(data=classAvg.tolist(0))
