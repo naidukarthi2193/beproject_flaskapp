@@ -65,7 +65,7 @@ def classAttention():
         for key in attentiondata.keys():
             grapharr.append([data["attention"] for data in attentiondata[key]])
         # print(grapharr)
-        grapharr = np.array(grapharr, dtype=object)
+        # grapharr = np.array(grapharr, dtype=object)
         # classAvg, error = tolerant_mean(grapharr)
 
     except Exception as e:
