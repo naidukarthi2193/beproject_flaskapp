@@ -57,18 +57,18 @@ def teacherLecture():
 @twilioBlueprint.route('/classAttention', methods=['POST'])
 def classAttention():
     body = request.get_json(force=True)
+    grapharr = []
     try:
         attention_ref = db.collection(
             'attention').document(body["lecture_id"]).get()
         attentiondata = attention_ref.to_dict()
-        grapharr = []
+
         for key in attentiondata.keys():
             grapharr.append([data["attention"] for data in attentiondata[key]])
-        # print(grapharr)
+        grapharr = sorted(grapharr, key=len)[-1]
         # grapharr = np.array(grapharr, dtype=object)
         # classAvg, error = tolerant_mean(grapharr)
 
     except Exception as e:
         print(e)
-        return OperationFailed()
-    return OperationCorrect(data=sorted(grapharr, key=len)[-1])
+    return OperationCorrect(data=grapharr)
